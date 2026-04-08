@@ -1,86 +1,62 @@
 #!/bin/bash
 
-set -e
-
 clear
-
-echo "======================================="
-echo " ADMINER AUTO INSTALLER - DEBIAN 12"
-echo "======================================="
-echo ""
+echo "======================================"
+echo " ADMINER AUTO INSTALL + AUTO PORT"
+echo "======================================"
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Jalankan script sebagai ROOT"
+  echo "Jalankan sebagai root"
   exit
 fi
 
-SERVER_IP=$(hostname -I | awk '{print $1}')
-
-echo "Server IP: $SERVER_IP"
 echo ""
-
 echo "Update system..."
 apt update -y
 
-echo "Install Nginx + PHP..."
-apt install -y nginx php-fpm php-mysql curl
+echo ""
+echo "Install PHP..."
+apt install -y php php-mysql curl
 
 echo ""
 echo "Download Adminer..."
-mkdir -p /var/www/adminer
-cd /var/www/adminer
+mkdir -p /opt/adminer
+cd /opt/adminer
 
 curl -L https://www.adminer.org/latest.php -o index.php
 
 echo ""
-echo "Configuring Nginx..."
+echo "Mencari port kosong..."
 
-cat > /etc/nginx/sites-available/adminer <<EOF
-server {
+PORT=8080
 
-    listen 8080;
-    server_name _;
+while ss -tuln | grep -q ":$PORT "; do
+  PORT=$((PORT+1))
+done
 
-    root /var/www/adminer;
-    index index.php;
+echo "Port kosong ditemukan: $PORT"
 
-    location / {
-        try_files \$uri \$uri/ /index.php;
-    }
-
-    location ~ \.php\$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-    }
-
-}
-EOF
-
-ln -sf /etc/nginx/sites-available/adminer /etc/nginx/sites-enabled/adminer
+SERVER_IP=$(hostname -I | awk '{print $1}')
 
 echo ""
-echo "Restart services..."
+echo "Menjalankan Adminer..."
 
-systemctl restart php8.2-fpm
-systemctl restart nginx
+nohup php -S 0.0.0.0:$PORT > /dev/null 2>&1 &
 
 echo ""
-echo "======================================="
-echo " INSTALLATION COMPLETE"
-echo "======================================="
+echo "======================================"
+echo " ADMINER GUI SIAP"
+echo "======================================"
 echo ""
-
-echo "ADMINER GUI ACCESS:"
-echo "http://$SERVER_IP:8080"
+echo "Akses dari browser:"
 echo ""
-
-echo "DATABASE LOGIN EXAMPLE:"
+echo "http://$SERVER_IP:$PORT"
+echo ""
+echo "Login database:"
 echo "System   : MySQL"
 echo "Server   : localhost"
-echo "Username : tracker"
+echo "User     : tracker"
 echo "Password : tracker123456"
 echo "Database : tracker"
 echo ""
-
-echo "======================================="
-echo ""
+echo "======================================"
