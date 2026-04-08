@@ -3,4 +3,4 @@ wget https://raw.githubusercontent.com/aka-jaya-5/server/main/install.sh && chmo
 
 lengkap
 
-wget https://raw.githubusercontent.com/aka-jaya-5/server/main/installfull.sh && chmod +x installfull.sh && ./installfull.sh
+wget https://raw.githubusercontent.com/aka-jaya-5/server/main/install-traccar.sh && chmod +x install-traccar.sh && ./install-traccar.sh
