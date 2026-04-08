@@ -27,7 +27,9 @@ echo "Update system..."
 apt update -y
 apt upgrade -y
 
+echo ""
 echo "Install dependencies..."
+echo ""
 
 apt install -y \
 curl \
@@ -35,10 +37,17 @@ wget \
 unzip \
 nginx \
 openjdk-17-jre \
-mysql-server
+mariadb-server
 
 echo ""
-echo "Setup MySQL Database..."
+echo "Start MariaDB..."
+echo ""
+
+systemctl start mariadb
+systemctl enable mariadb
+
+echo ""
+echo "Setup Database..."
 echo ""
 
 mysql <<EOF
@@ -96,11 +105,11 @@ echo " INSTALLATION COMPLETED"
 echo "========================================="
 echo ""
 
-echo "ACCESS TRACCAR:"
+echo "TRACCAR ACCESS:"
 echo "http://$SERVER_IP:8082"
 echo ""
 
-echo "LOGIN DEFAULT:"
+echo "DEFAULT LOGIN:"
 echo "Email    : admin"
 echo "Password : admin"
 echo ""
@@ -115,11 +124,11 @@ echo "SERVER INFO:"
 echo "Server IP : $SERVER_IP"
 echo ""
 
-echo "CHECK TRACCAR STATUS:"
+echo "TRACCAR STATUS:"
 echo "systemctl status traccar"
 echo ""
 
-echo "VIEW TRACCAR LOG:"
+echo "VIEW LOG:"
 echo "tail -f /opt/traccar/logs/tracker-server.log"
 echo ""
 
